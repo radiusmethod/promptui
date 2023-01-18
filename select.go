@@ -73,6 +73,16 @@ type Select struct {
 	// For search mode to work, the Search property must be implemented.
 	StartInSearchMode bool
 
+	// Checkbox, is the selector a checkbox? if true, every time chosed, the result will store a value, until
+	// enter is pressed
+	Checkbox bool
+
+	// ChosenIndex, store chosed items index
+	ChosenIndex *[]int
+
+	// Used for display chosed box
+	ChosenIcon string
+
 	list *list.List
 
 	// A function that determines how to render the cursor
@@ -116,24 +126,27 @@ type Key struct {
 // text/template syntax. Custom state, colors and background color are available for use inside
 // the templates and are documented inside the Variable section of the docs.
 //
-// Examples
+// # Examples
 //
 // text/templates use a special notation to display programmable content. Using the double bracket notation,
 // the value can be printed with specific helper functions. For example
 //
 // This displays the value given to the template as pure, unstylized text. Structs are transformed to string
 // with this notation.
-// 	'{{ . }}'
+//
+//	'{{ . }}'
 //
 // This displays the name property of the value colored in cyan
-// 	'{{ .Name | cyan }}'
+//
+//	'{{ .Name | cyan }}'
 //
 // This displays the label property of value colored in red with a cyan background-color
-// 	'{{ .Label | red | cyan }}'
+//
+//	'{{ .Label | red | cyan }}'
 //
 // See the doc of text/template for more info: https://golang.org/pkg/text/template/
 //
-// Notes
+// # Notes
 //
 // Setting any of these templates will remove the icons from the default templates. They must
 // be added back in each of their specific templates. The styles.go constants contains the default icons.
@@ -255,6 +268,8 @@ func (s *Select) innerRun(cursorPos, scroll int, top rune) (int, string, error) 
 
 	c.SetListener(func(line []rune, pos int, key rune) ([]rune, int, bool) {
 		switch {
+		case key == KeySpace:
+			s.storeChosen()
 		case key == KeyEnter:
 			return nil, 0, true
 		case key == s.Keys.Next.Code || (key == 'j' && !searchMode):
@@ -307,6 +322,7 @@ func (s *Select) innerRun(cursorPos, scroll int, top rune) (int, string, error) 
 		sb.Write(label)
 
 		items, idx := s.list.Items()
+		cursor := s.list.GetCursor()
 		last := len(items) - 1
 
 		for i, item := range items {
@@ -322,6 +338,20 @@ func (s *Select) innerRun(cursorPos, scroll int, top rune) (int, string, error) 
 			case last:
 				if s.list.CanPageDown() {
 					page = "↓"
+				}
+			}
+
+			if s.Checkbox {
+				for _, chosedIndex := range *s.ChosenIndex {
+					if cursor == idx {
+						if chosedIndex == i {
+							page = page + " " + s.ChosenIcon
+						}
+					} else {
+						if i+(cursor-idx) == chosedIndex {
+							page = page + " " + s.ChosenIcon
+						}
+					}
 				}
 			}
 
@@ -400,6 +430,17 @@ func (s *Select) innerRun(cursorPos, scroll int, top rune) (int, string, error) 
 	rl.Close()
 
 	return s.list.Index(), fmt.Sprintf("%v", item), err
+}
+
+func (s *Select) storeChosen() {
+	currentIndex := s.list.Index()
+	for index, savedIndex := range *s.ChosenIndex {
+		if savedIndex == currentIndex {
+			*s.ChosenIndex = append((*s.ChosenIndex)[:index], (*s.ChosenIndex)[index+1:]...)
+			return
+		}
+	}
+	*s.ChosenIndex = append(*s.ChosenIndex, currentIndex)
 }
 
 // ScrollPosition returns the current scroll position.
