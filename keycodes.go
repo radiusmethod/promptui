@@ -26,4 +26,8 @@ var (
 	// KeyForward is the default key to page down during selection.
 	KeyForward        rune = readline.CharForward
 	KeyForwardDisplay      = "→"
+
+	// KeySpace is the default key to chose options for checkbox
+	KeySpace        rune = 32
+	KeySpaceDisplay      = "SPACE"
 )

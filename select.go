@@ -109,6 +109,9 @@ type SelectKeys struct {
 
 	// Search is the key used to trigger the search mode for the list. Default to the "/" key.
 	Search Key
+
+	// Select is the key used to trigger the multiple select mode for the list. Default to the space key.
+	Select Key
 }
 
 // Key defines a keyboard code and a display representation for the help menu.
@@ -314,7 +317,7 @@ func (s *Select) innerRun(cursorPos, scroll int, top rune) (int, string, error) 
 			header := SearchPrompt + cur.Format()
 			sb.WriteString(header)
 		} else if !s.HideHelp {
-			help := s.renderHelp(canSearch)
+			help := s.renderHelp(canSearch, s.Checkbox)
 			sb.Write(help)
 		}
 
@@ -512,8 +515,9 @@ func (s *Select) prepareTemplates() error {
 
 	if tpls.Help == "" {
 		tpls.Help = fmt.Sprintf(`{{ "Use the arrow keys to navigate:" | faint }} {{ .NextKey | faint }} ` +
-			`{{ .PrevKey | faint }} {{ .PageDownKey | faint }} {{ .PageUpKey | faint }} ` +
-			`{{ if .Search }} {{ "and" | faint }} {{ .SearchKey | faint }} {{ "toggles search" | faint }}{{ end }}`)
+			`{{ .PrevKey | faint }} {{ .PageDownKey | faint }} {{ .PageUpKey | faint }}` +
+			`{{ if .Search }} {{ " and" | faint }} {{ .SearchKey | faint }} {{ "toggles search" | faint }}{{ end }}` +
+			`{{ if .MultipleSelect }} {{ " and" | faint }} {{ .SelectKey | faint }} {{ "toggles select" | faint }}{{ end }}`)
 	}
 
 	tpl, err = template.New("").Funcs(tpls.FuncMap).Parse(tpls.Help)
@@ -619,6 +623,7 @@ func (s *Select) setKeys() {
 		PageUp:   Key{Code: KeyBackward, Display: KeyBackwardDisplay},
 		PageDown: Key{Code: KeyForward, Display: KeyForwardDisplay},
 		Search:   Key{Code: '/', Display: "/"},
+		Select:   Key{Code: KeySpace, Display: KeySpaceDisplay},
 	}
 }
 
@@ -643,21 +648,25 @@ func (s *Select) renderDetails(item interface{}) [][]byte {
 	return bytes.Split(output, []byte("\n"))
 }
 
-func (s *Select) renderHelp(b bool) []byte {
+func (s *Select) renderHelp(b bool, c bool) []byte {
 	keys := struct {
-		NextKey     string
-		PrevKey     string
-		PageDownKey string
-		PageUpKey   string
-		Search      bool
-		SearchKey   string
+		NextKey        string
+		PrevKey        string
+		PageDownKey    string
+		PageUpKey      string
+		Search         bool
+		SearchKey      string
+		MultipleSelect bool
+		SelectKey      string
 	}{
-		NextKey:     s.Keys.Next.Display,
-		PrevKey:     s.Keys.Prev.Display,
-		PageDownKey: s.Keys.PageDown.Display,
-		PageUpKey:   s.Keys.PageUp.Display,
-		SearchKey:   s.Keys.Search.Display,
-		Search:      b,
+		NextKey:        s.Keys.Next.Display,
+		PrevKey:        s.Keys.Prev.Display,
+		PageDownKey:    s.Keys.PageDown.Display,
+		PageUpKey:      s.Keys.PageUp.Display,
+		SearchKey:      s.Keys.Search.Display,
+		SelectKey:      s.Keys.Select.Display,
+		Search:         b,
+		MultipleSelect: c,
 	}
 
 	return render(s.Templates.help, keys)
