@@ -29,6 +29,9 @@ type Prompt struct {
 	// Validate is an optional function that fill be used against the entered value in the prompt to validate it.
 	Validate ValidateFunc
 
+	// Lazy validation on <Enter> only.
+	LazyValidation bool
+
 	// Mask is an optional rune that sets which character to display instead of the entered characters. This
 	// allows hiding private information like passwords.
 	Mask rune
@@ -58,19 +61,22 @@ type Prompt struct {
 // text/template syntax. Custom state, colors and background color are available for use inside
 // the templates and are documented inside the Variable section of the docs.
 //
-// Examples
+// # Examples
 //
 // text/templates use a special notation to display programmable content. Using the double bracket notation,
 // the value can be printed with specific helper functions. For example
 //
 // This displays the value given to the template as pure, unstylized text.
-// 	'{{ . }}'
+//
+//	'{{ . }}'
 //
 // This displays the value colored in cyan
-// 	'{{ . | cyan }}'
+//
+//	'{{ . | cyan }}'
 //
 // This displays the value colored in red with a cyan background-color
-// 	'{{ . | red | cyan }}'
+//
+//	'{{ . | red | cyan }}'
 //
 // See the doc of text/template for more info: https://golang.org/pkg/text/template/
 type PromptTemplates struct {
@@ -160,8 +166,14 @@ func (p *Prompt) Run() (string, error) {
 
 	listen := func(input []rune, pos int, key rune) ([]rune, int, bool) {
 		_, _, keepOn := cur.Listen(input, pos, key)
-		err := validFn(cur.Get())
-		var prompt []byte
+		var (
+			prompt []byte
+			err    error
+		)
+
+		if !p.LazyValidation {
+			err = validFn(cur.Get())
+		}
 
 		if err != nil {
 			prompt = render(p.Templates.invalid, p.Label)
