@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"testing"
 
-	"github.com/SimFG/promptui/screenbuf"
+	"github.com/radiusmethod/promptui/screenbuf"
 )
 
 func TestSelectTemplateRender(t *testing.T) {

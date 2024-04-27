@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/SimFG/promptui"
+	"github.com/radiusmethod/promptui"
 )
 
 func main() {

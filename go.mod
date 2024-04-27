@@ -1,4 +1,4 @@
-module github.com/SimFG/promptui
+module github.com/radiusmethod/promptui
 
 go 1.18
 

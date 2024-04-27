@@ -9,8 +9,8 @@ import (
 	"text/template"
 
 	"github.com/chzyer/readline"
-	"github.com/SimFG/promptui/list"
-	"github.com/SimFG/promptui/screenbuf"
+	"github.com/radiusmethod/promptui/list"
+	"github.com/radiusmethod/promptui/screenbuf"
 )
 
 // SelectedAdd is used internally inside SelectWithAdd when the add option is selected in select mode.
