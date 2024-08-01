@@ -280,7 +280,7 @@ func (s *Select) innerRun(cursorPos, scroll int, top rune) (int, string, error) 
 			return nil, 0, true
 		case key == s.Keys.Next.Code || (key == 'j' && !searchMode):
 			// Add cyclic scrolling logic for down arrow key
-			if s.list.Index() == length+1 {
+			if s.list.Index() == length+s.Size {
 				s.list.SetCursor(0)
 			} else {
 				s.list.Next()
