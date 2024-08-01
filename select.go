@@ -280,7 +280,7 @@ func (s *Select) innerRun(cursorPos, scroll int, top rune) (int, string, error) 
 			return nil, 0, true
 		case key == s.Keys.Next.Code || (key == 'j' && !searchMode):
 			// Add cyclic scrolling logic for down arrow key
-			if s.list.Index() == length {
+			if s.list.Index() == length+1 {
 				s.list.SetCursor(0)
 			} else {
 				s.list.Next()
@@ -288,7 +288,7 @@ func (s *Select) innerRun(cursorPos, scroll int, top rune) (int, string, error) 
 		case key == s.Keys.Prev.Code || (key == 'k' && !searchMode):
 			// Add cyclic scrolling logic for up arrow key
 			if s.list.Index() == 0 {
-				s.list.SetCursor(length)
+				s.list.SetCursor(length + s.Size)
 			} else {
 				s.list.Prev()
 			}
@@ -337,7 +337,6 @@ func (s *Select) innerRun(cursorPos, scroll int, top rune) (int, string, error) 
 		label := render(s.Templates.label, s.Label)
 		sb.Write(label)
 
-		items, idx := s.list.Items()
 		cursor := s.list.GetCursor()
 		last := len(items) - 1
 
