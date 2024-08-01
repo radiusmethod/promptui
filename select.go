@@ -271,7 +271,11 @@ func (s *Select) innerRun(cursorPos, scroll int, top rune) (int, string, error) 
 
 	c.SetListener(func(line []rune, pos int, key rune) ([]rune, int, bool) {
 		items, idx := s.list.Items()
-		length := len(items)
+		itemsFull, ok := s.Items.([]string)
+		if !ok {
+			panic("Items is not of type []string")
+		}
+		length := len(itemsFull) - 1
 
 		switch {
 		case key == KeySpace:
@@ -280,7 +284,7 @@ func (s *Select) innerRun(cursorPos, scroll int, top rune) (int, string, error) 
 			return nil, 0, true
 		case key == s.Keys.Next.Code || (key == 'j' && !searchMode):
 			// Add cyclic scrolling logic for down arrow key
-			if s.list.Index() == length+s.Size {
+			if s.list.Index() == length {
 				s.list.SetCursor(0)
 			} else {
 				s.list.Next()
@@ -288,7 +292,7 @@ func (s *Select) innerRun(cursorPos, scroll int, top rune) (int, string, error) 
 		case key == s.Keys.Prev.Code || (key == 'k' && !searchMode):
 			// Add cyclic scrolling logic for up arrow key
 			if s.list.Index() == 0 {
-				s.list.SetCursor(length + s.Size)
+				s.list.SetCursor(length)
 			} else {
 				s.list.Prev()
 			}

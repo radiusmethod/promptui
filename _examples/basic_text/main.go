@@ -6,12 +6,12 @@ import (
 )
 
 func main() {
-	items := []string{"Option 1", "Option 2", "Option 3", "Option 4", "Option 5"}
+	items := []string{"Option 1", "Option 2", "Option 3", "Option 4", "Option 5", "Option 6", "Option 7"}
 
 	prompt := promptui.Select{
 		Label:             "Select an Option",
 		Items:             items,
-		Size:              3,
+		Size:              5,
 		StartInSearchMode: true,
 	}
 
