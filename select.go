@@ -270,15 +270,28 @@ func (s *Select) innerRun(cursorPos, scroll int, top rune) (int, string, error) 
 	s.list.SetStart(scroll)
 
 	c.SetListener(func(line []rune, pos int, key rune) ([]rune, int, bool) {
+		items, idx := s.list.Items()
+		length := len(items)
+
 		switch {
 		case key == KeySpace:
 			s.storeChosen()
 		case key == KeyEnter:
 			return nil, 0, true
 		case key == s.Keys.Next.Code || (key == 'j' && !searchMode):
-			s.list.Next()
+			// Add cyclic scrolling logic for down arrow key
+			if s.list.Index() == length {
+				s.list.SetCursor(0)
+			} else {
+				s.list.Next()
+			}
 		case key == s.Keys.Prev.Code || (key == 'k' && !searchMode):
-			s.list.Prev()
+			// Add cyclic scrolling logic for up arrow key
+			if s.list.Index() == 0 {
+				s.list.SetCursor(length)
+			} else {
+				s.list.Prev()
+			}
 		case key == s.Keys.Search.Code:
 			if !canSearch {
 				break
