@@ -283,10 +283,6 @@ func (s *Select) innerRun(cursorPos, scroll int, top rune) (int, string, error) 
 		case key == KeyEnter:
 			return nil, 0, true
 		case key == s.Keys.Next.Code || (key == 'j' && !searchMode):
-			if length == 0 {
-				// Handle the case where there are no items
-				s.list.SetCursor(0)
-			}
 			// Add cyclic scrolling logic for down arrow key
 			if s.list.Index() == length {
 				s.list.SetCursor(0)
@@ -294,10 +290,6 @@ func (s *Select) innerRun(cursorPos, scroll int, top rune) (int, string, error) 
 				s.list.Next()
 			}
 		case key == s.Keys.Prev.Code || (key == 'k' && !searchMode):
-			if length == 0 {
-				// Handle the case where there are no items
-				s.list.SetCursor(0)
-			}
 			// Add cyclic scrolling logic for up arrow key
 			if s.list.Index() == 0 {
 				s.list.SetCursor(length)

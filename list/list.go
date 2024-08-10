@@ -201,14 +201,15 @@ func (l *List) CanPageUp() bool {
 // Index returns the index of the item currently selected inside the searched list. If no item is selected,
 // the NotFound (-1) index is returned.
 func (l *List) Index() int {
+	if len(l.scope) == 0 || l.cursor < 0 || l.cursor >= len(l.scope) {
+		return NotFound // Return -1 or any other value that indicates nothing is selected
+	}
 	selected := l.scope[l.cursor]
-
 	for i, item := range l.items {
 		if item == selected {
 			return i
 		}
 	}
-
 	return NotFound
 }
 
