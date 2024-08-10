@@ -205,11 +205,13 @@ func (l *List) Index() int {
 		return NotFound // Return -1 or any other value that indicates nothing is selected
 	}
 	selected := l.scope[l.cursor]
+
 	for i, item := range l.items {
 		if item == selected {
 			return i
 		}
 	}
+
 	return NotFound
 }
 

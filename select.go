@@ -270,7 +270,6 @@ func (s *Select) innerRun(cursorPos, scroll int, top rune) (int, string, error) 
 	s.list.SetStart(scroll)
 
 	c.SetListener(func(line []rune, pos int, key rune) ([]rune, int, bool) {
-		items, idx := s.list.Items()
 		itemsFull, ok := s.Items.([]string)
 		if !ok {
 			panic("Items is not of type []string")
@@ -341,6 +340,7 @@ func (s *Select) innerRun(cursorPos, scroll int, top rune) (int, string, error) 
 		label := render(s.Templates.label, s.Label)
 		sb.Write(label)
 
+		items, idx := s.list.Items()
 		cursor := s.list.GetCursor()
 		last := len(items) - 1
 
@@ -452,6 +452,10 @@ func (s *Select) innerRun(cursorPos, scroll int, top rune) (int, string, error) 
 }
 
 func (s *Select) storeChosen() {
+	if s.ChosenIndex == nil {
+		s.ChosenIndex = &[]int{}
+	}
+
 	currentIndex := s.list.Index()
 	for index, savedIndex := range *s.ChosenIndex {
 		if savedIndex == currentIndex {
