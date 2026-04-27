@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+## [0.11.0] - 2026-04-27
+
+### Changed
+
+- Raise minimum Go version to 1.21
+- Update `golang.org/x/sys` to v0.30.0
+
+## [0.10.0] - 2024-08-01
+
+### Fixed
+
+- `Select` cyclic scrolling: use the full item count rather than the paginated length when wrapping the cursor at the top/bottom of the list
+
 ## [0.9.0] - 2021-10-30
 
 ### Fixed
